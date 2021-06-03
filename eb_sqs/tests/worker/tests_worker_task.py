@@ -1,5 +1,3 @@
-from __future__ import absolute_import, unicode_literals
-
 import json
 from unittest import TestCase
 
@@ -41,7 +39,8 @@ class WorkerTaskTest(TestCase):
         self.assertEqual(worker_task.retry_id, 'retry-uuid')
 
     def test_serialize_pickle(self):
-        worker_task1 = WorkerTask('id-1', None, 'default', dummy_function, [], {'object': TestObject()}, 5, 0, None, True)
+        worker_task1 = WorkerTask('id-1', None, 'default', dummy_function, [], {'object': TestObject()}, 5, 0, None,
+                                  True)
         msg = worker_task1.serialize()
 
         worker_task2 = WorkerTask.deserialize(msg)

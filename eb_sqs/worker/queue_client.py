@@ -1,5 +1,3 @@
-from __future__ import absolute_import, unicode_literals
-
 from abc import ABCMeta, abstractmethod
 
 
@@ -14,9 +12,7 @@ class QueueDoesNotExistException(QueueClientException):
         self.queue_name = queue_name
 
 
-class QueueClient(object):
-    __metaclass__ = ABCMeta
-
+class QueueClient(object, metaclass=ABCMeta):
     @abstractmethod
     def add_message(self, queue_name, msg, delay):
         # type: (unicode, unicode, int) -> None

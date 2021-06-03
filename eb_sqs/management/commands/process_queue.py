@@ -1,12 +1,7 @@
-from __future__ import absolute_import, unicode_literals
-
-import importlib
-
 from django.core.management import BaseCommand, CommandError
 from django.utils.module_loading import import_string
 
 from eb_sqs import settings
-from eb_sqs.aws.sqs_queue_client import SqsQueueClient
 from eb_sqs.worker.service import WorkerService
 
 

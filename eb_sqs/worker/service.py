@@ -1,5 +1,3 @@
-from __future__ import absolute_import, unicode_literals
-
 import logging
 import signal
 from datetime import timedelta
@@ -41,7 +39,7 @@ class WorkerService(object):
 
         logger.debug('[django-eb-sqs] Connecting to SQS: {}'.format(', '.join(queue_names)))
 
-        prefixes = list(filter(lambda qn: qn.startswith(self._PREFIX_STR), queue_names))
+        prefixes = list([qn for qn in queue_names if qn.startswith(self._PREFIX_STR)])
         queues = self.sqs_client.get_queues_by_names(
             list(set(queue_names) - set(prefixes))
         )

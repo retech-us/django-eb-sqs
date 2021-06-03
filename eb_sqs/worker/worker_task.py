@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+
 
 import base64
 import importlib
@@ -7,10 +7,7 @@ import uuid
 
 from eb_sqs import settings
 
-try:
-    import cPickle as pickle
-except Exception:
-    import pickle
+import pickle
 
 
 class WorkerTask(object):

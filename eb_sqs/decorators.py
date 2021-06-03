@@ -1,5 +1,3 @@
-from __future__ import absolute_import, unicode_literals
-
 from eb_sqs import settings
 from eb_sqs.worker.worker_factory import WorkerFactory
 from eb_sqs.worker.worker_task import WorkerTask
@@ -15,11 +13,12 @@ def func_delay_decorator(func, queue_name, max_retries_count, use_pickle):
     def wrapper(*args, **kwargs):
         # type: (tuple, dict) -> Any
         queue = _get_kwarg_val(kwargs, 'queue_name', queue_name if queue_name else settings.DEFAULT_QUEUE)
-        max_retries = _get_kwarg_val(kwargs, 'max_retries', max_retries_count if max_retries_count else settings.DEFAULT_MAX_RETRIES)
+        max_retries = _get_kwarg_val(kwargs, 'max_retries',
+                                     max_retries_count if max_retries_count else settings.DEFAULT_MAX_RETRIES)
         pickle = _get_kwarg_val(kwargs, 'use_pickle', use_pickle if use_pickle else settings.USE_PICKLE)
 
         execute_inline = _get_kwarg_val(kwargs, 'execute_inline', False) or settings.EXECUTE_INLINE
-        delay = _get_kwarg_val(kwargs, 'delay',  settings.DEFAULT_DELAY)
+        delay = _get_kwarg_val(kwargs, 'delay', settings.DEFAULT_DELAY)
         group_id = _get_kwarg_val(kwargs, 'group_id', None)
 
         worker = WorkerFactory.default().create()
@@ -38,6 +37,7 @@ def func_retry_decorator(worker_task):
 
         worker = WorkerFactory.default().create()
         return worker.retry(worker_task, delay, execute_inline, count_retries)
+
     return wrapper
 
 

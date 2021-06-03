@@ -1,5 +1,3 @@
-from __future__ import absolute_import, unicode_literals
-
 from unittest import TestCase
 
 from mock import Mock
@@ -16,10 +14,12 @@ def dummy_task(msg):
     if not msg:
         raise Exception('No message')
 
+
 @task(queue_name='CustomQueue')
 def dummy_task_custom_queue():
     # type: (unicode) -> None
     pass
+
 
 @task()
 def dummy_retry_task(msg):

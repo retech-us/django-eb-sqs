@@ -1,6 +1,3 @@
-from __future__ import absolute_import, unicode_literals
-
-
 class WorkerException(Exception):
     pass
 
@@ -29,7 +26,7 @@ class MaxRetriesReachedException(WorkerException):
 
 
 class QueueException(WorkerException):
-        pass
+    pass
 
 
 class InvalidQueueException(QueueException):

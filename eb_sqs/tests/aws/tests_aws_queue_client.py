@@ -1,11 +1,9 @@
-from __future__ import absolute_import, unicode_literals
-
 import time
 from unittest import TestCase
-from mock import patch
 
 import boto3
 from botocore.exceptions import ClientError
+from mock import patch
 from moto import mock_sqs
 
 from eb_sqs import settings
@@ -81,7 +79,8 @@ class AwsQueueClientTest(TestCase):
 
         # moto throws exception inconsistent with boto, thus the patching
         with patch.object(queue_client.queue_cache[full_queue_name], 'send_message') as send_message_fn:
-            send_message_fn.side_effect = ClientError({'Error': {'Code': 'AWS.SimpleQueueService.NonExistentQueue'}}, None)
+            send_message_fn.side_effect = ClientError({'Error': {'Code': 'AWS.SimpleQueueService.NonExistentQueue'}},
+                                                      None)
 
             queue_client.add_message(queue_name, 'msg', 0)
 
