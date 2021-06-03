@@ -14,3 +14,4 @@
 # Ignore built files for PyPi
 build/
 dist/
+/venv/

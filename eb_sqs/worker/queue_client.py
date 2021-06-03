@@ -21,3 +21,13 @@ class QueueClient(object):
     def add_message(self, queue_name, msg, delay):
         # type: (unicode, unicode, int) -> None
         pass
+
+    @abstractmethod
+    def get_queues_by_prefixes(self, prefixes):
+        # type: (list) -> list
+        pass
+
+    @abstractmethod
+    def get_queues_by_names(self, queue_names):
+        # type: (list) -> list
+        pass

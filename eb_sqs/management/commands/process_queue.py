@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.management import BaseCommand, CommandError
 
+from eb_sqs.aws.sqs_queue_client import SqsQueueClient
 from eb_sqs.worker.service import WorkerService
 
 
@@ -19,4 +20,5 @@ class Command(BaseCommand):
 
         queue_names = [queue_name.rstrip() for queue_name in options['queue_names'].split(',')]
 
-        WorkerService().process_queues(queue_names)
+        queue_client = SqsQueueClient()
+        WorkerService(queue_client).process_queues(queue_names)

@@ -6,12 +6,14 @@ from eb_sqs.worker.worker_factory import WorkerFactory
 
 
 class SqsWorkerFactory(WorkerFactory):
-    _WORKER = None # type: Worker
+    _WORKER = None  # type: Worker
 
     def __init__(self):
         super(SqsWorkerFactory, self).__init__()
 
     def create(self):
         if not SqsWorkerFactory._WORKER:
-            SqsWorkerFactory._WORKER = Worker(SqsQueueClient())
+            # TODO: add setting so we can specify the queue client class
+            queue_client = SqsQueueClient()
+            SqsWorkerFactory._WORKER = Worker(queue_client)
         return SqsWorkerFactory._WORKER

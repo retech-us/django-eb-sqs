@@ -5,14 +5,13 @@ import signal
 from datetime import timedelta
 from time import sleep
 
-import boto3
-from botocore.config import Config
-from botocore.exceptions import ClientError
 import django.dispatch
+from botocore.exceptions import ClientError
 from django.utils import timezone
 
 from eb_sqs import settings
 from eb_sqs.worker.commons import django_db_management
+from eb_sqs.worker.queue_client import QueueClient
 from eb_sqs.worker.worker import Worker
 from eb_sqs.worker.worker_exceptions import ExecutionFailedException
 from eb_sqs.worker.worker_factory import WorkerFactory
@@ -28,10 +27,10 @@ class WorkerService(object):
     _PREFIX_STR = 'prefix:'
     _RECEIVE_COUNT_ATTRIBUTE = 'ApproximateReceiveCount'
 
-    def __init__(self):
-        # type: () -> None
+    def __init__(self, sqs_client: QueueClient):
         self._exit_gracefully = False
         self._last_healthcheck_time = None
+        self.sqs_client = sqs_client
 
     def process_queues(self, queue_names):
         # type: (list) -> None
@@ -42,14 +41,10 @@ class WorkerService(object):
 
         logger.debug('[django-eb-sqs] Connecting to SQS: {}'.format(', '.join(queue_names)))
 
-        sqs = boto3.resource(
-            'sqs',
-            region_name=settings.AWS_REGION,
-            config=Config(retries={'max_attempts': settings.AWS_MAX_RETRIES})
-        )
-
         prefixes = list(filter(lambda qn: qn.startswith(self._PREFIX_STR), queue_names))
-        queues = self.get_queues_by_names(sqs, list(set(queue_names) - set(prefixes)))
+        queues = self.sqs_client.get_queues_by_names(
+            list(set(queue_names) - set(prefixes))
+        )
 
         queue_prefixes = [prefix.split(self._PREFIX_STR)[1] for prefix in prefixes]
         static_queues = queues
@@ -71,7 +66,7 @@ class WorkerService(object):
         while not self._exit_gracefully:
             if len(queue_prefixes) > 0 and \
                     timezone.now() - timedelta(seconds=settings.REFRESH_PREFIX_QUEUES_S) > last_update_time:
-                queues = static_queues + self.get_queues_by_prefixes(sqs, queue_prefixes)
+                queues = static_queues + self.sqs_client.get_queues_by_prefixes(queue_prefixes)
                 last_update_time = timezone.now()
                 logger.debug('[django-eb-sqs] Updated SQS queues: {}'.format(
                     ', '.join([queue.url for queue in queues])
@@ -100,8 +95,8 @@ class WorkerService(object):
                 for msg in messages:
                     self._execute_user_code(lambda: self._process_message(msg, worker))
                     msg_entries.append({
-                            'Id': msg.message_id,
-                            'ReceiptHandle': msg.receipt_handle
+                        'Id': msg.message_id,
+                        'ReceiptHandle': msg.receipt_handle
                     })
 
                 self._send_signal(MESSAGES_PROCESSED, messages=messages)
@@ -112,13 +107,15 @@ class WorkerService(object):
             except ClientError as exc:
                 error_code = exc.response.get('Error', {}).get('Code', None)
                 if error_code == 'AWS.SimpleQueueService.NonExistentQueue' and queue not in static_queues:
-                    logger.debug('[django-eb-sqs] Queue was already deleted {}: {}'.format(queue.url, exc), exc_info=True)
+                    logger.debug('[django-eb-sqs] Queue was already deleted {}: {}'.format(queue.url, exc),
+                                 exc_info=True)
                 else:
                     logger.warning('[django-eb-sqs] Error polling queue {}: {}'.format(queue.url, exc), exc_info=True)
             except Exception as exc:
                 logger.warning('[django-eb-sqs] Error polling queue {}: {}'.format(queue.url, exc), exc_info=True)
 
-            if timezone.now() - timedelta(seconds=settings.MIN_HEALTHCHECK_WRITE_PERIOD_S) > self._last_healthcheck_time:
+            if timezone.now() - timedelta(
+                    seconds=settings.MIN_HEALTHCHECK_WRITE_PERIOD_S) > self._last_healthcheck_time:
                 self.write_healthcheck_file()
                 self._last_healthcheck_time = timezone.now()
 
@@ -171,19 +168,6 @@ class WorkerService(object):
                 function()
         except Exception as exc:
             logger.error('[django-eb-sqs] Unhandled error: {}'.format(exc), exc_info=True)
-
-    def get_queues_by_names(self, sqs, queue_names):
-        # type: (ServiceResource, list) -> list
-        return [sqs.get_queue_by_name(QueueName=queue_name) for queue_name in queue_names]
-
-    def get_queues_by_prefixes(self, sqs, prefixes):
-        # type: (ServiceResource, list) -> list
-        queues = []
-
-        for prefix in prefixes:
-            queues += sqs.queues.filter(QueueNamePrefix=prefix)
-
-        return queues
 
     def write_healthcheck_file(self):
         # type: () -> None

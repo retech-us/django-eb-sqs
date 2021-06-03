@@ -80,3 +80,12 @@ class SqsQueueClient(QueueClient):
             raise
         except Exception as ex:
             raise QueueClientException(ex)
+
+    def get_queues_by_prefixes(self, prefixes):
+        queues = []
+        for prefix in prefixes:
+            queues += self.sqs.queues.filter(QueueNamePrefix=prefix)
+        return queues
+
+    def get_queues_by_names(self, queue_names):
+        return [self.sqs.get_queue_by_name(QueueName=queue_name) for queue_name in queue_names]
