@@ -1,6 +1,5 @@
 from unittest import TestCase
-
-from mock import Mock, call
+from unittest.mock import Mock, call
 
 from eb_sqs import settings
 from eb_sqs.auto_tasks.exceptions import RetryableTaskException
@@ -63,7 +62,9 @@ class AutoTasksTest(TestCase):
     def test_task_retry_method(self):
         self._test_service.task_retry_method(*self._args, **self._kwargs)
 
-        TestService.TEST_MOCK.task_retry_method.assert_has_calls([call(*self._args, **self._kwargs)] * TestService.MAX_RETRY_NUM)
+        TestService.TEST_MOCK.task_retry_method.assert_has_calls(
+            [call(*self._args, **self._kwargs)] * TestService.MAX_RETRY_NUM
+        )
 
         TestService.TEST_MOCK.task_max_retry_method.assert_called_once_with(*self._args, **self._kwargs)
 

@@ -1,6 +1,9 @@
+import typing
+
+
 class RetryableTaskException(Exception):
-    def __init__(self, inner, delay=None, count_retries=None, max_retries_func=None):
-        # type: (Exception, int, bool, Any) -> None
+    def __init__(self, inner: Exception, delay: int = None, count_retries: bool = None,
+                 max_retries_func: typing.Any = None):
         self._inner = inner
 
         self.delay = delay
@@ -8,5 +11,4 @@ class RetryableTaskException(Exception):
         self.max_retries_func = max_retries_func
 
     def __repr__(self):
-        # type: () -> str
         return repr(self._inner)

@@ -1,18 +1,16 @@
-
-
 import base64
 import importlib
 import json
+import pickle
+import typing
 import uuid
 
 from eb_sqs import settings
 
-import pickle
-
 
 class WorkerTask(object):
-    def __init__(self, id, group_id, queue, func, args, kwargs, max_retries, retry, retry_id, use_pickle):
-        # type: (str, unicode, unicode, Any, tuple, dict, int, int, unicode, bool) -> None
+    def __init__(self, id: str, group_id: typing.Optional[str], queue: str, func: callable, args: typing.Iterable, kwargs: dict, max_retries: int,
+                 retry: int, retry_id: typing.Optional[str], use_pickle: bool):
         super(WorkerTask, self).__init__()
         self.id = id
         self.group_id = group_id
@@ -28,29 +26,27 @@ class WorkerTask(object):
         self.abs_func_name = '{}.{}'.format(self.func.__module__, self.func.__name__)
 
     def execute(self):
-        # type: () -> Any
         from eb_sqs.decorators import func_retry_decorator
         self.func.retry_num = self.retry
         self.func.retry = func_retry_decorator(worker_task=self)
         return self.func(*self.args, **self.kwargs)
 
     def serialize(self):
-        # type: () -> unicode
         args = WorkerTask._pickle_args(self.args) if self.use_pickle else self.args
         kwargs = WorkerTask._pickle_args(self.kwargs) if self.use_pickle else self.kwargs
 
         task = {
-                'id': self.id,
-                'groupId': self.group_id,
-                'queue': self.queue,
-                'func': self.abs_func_name,
-                'args': args,
-                'kwargs': kwargs,
-                'maxRetries': self.max_retries,
-                'retry': self.retry,
-                'retryId': self.retry_id,
-                'pickle': self.use_pickle,
-            }
+            'id': self.id,
+            'groupId': self.group_id,
+            'queue': self.queue,
+            'func': self.abs_func_name,
+            'args': args,
+            'kwargs': kwargs,
+            'maxRetries': self.max_retries,
+            'retry': self.retry,
+            'retryId': self.retry_id,
+            'pickle': self.use_pickle,
+        }
 
         return json.dumps(task)
 
@@ -74,12 +70,10 @@ class WorkerTask(object):
 
     @staticmethod
     def _pickle_args(args):
-        # type: (Any) -> unicode
         return base64.b64encode(pickle.dumps(args, pickle.HIGHEST_PROTOCOL)).decode('utf-8')
 
     @staticmethod
-    def deserialize(msg):
-        # type: (unicode) -> WorkerTask
+    def deserialize(msg: str) -> 'WorkerTask':
         task = json.loads(msg)
 
         id = task.get('id', str(uuid.uuid4()))
@@ -107,6 +101,5 @@ class WorkerTask(object):
         return WorkerTask(id, group_id, queue, func, args, kwargs, max_retries, retry, retry_id, use_pickle)
 
     @staticmethod
-    def _unpickle_args(args):
-        # type: (unicode) -> dict
+    def _unpickle_args(args: str) -> typing.Any:
         return pickle.loads(base64.b64decode(args.encode('utf-8')))

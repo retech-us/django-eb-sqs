@@ -1,6 +1,5 @@
 from unittest import TestCase
-
-from mock import Mock
+from unittest.mock import Mock
 
 from eb_sqs import settings
 from eb_sqs.decorators import task

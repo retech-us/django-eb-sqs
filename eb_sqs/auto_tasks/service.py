@@ -1,5 +1,6 @@
 import importlib
 import logging
+import typing
 
 from eb_sqs.auto_tasks.exceptions import RetryableTaskException
 from eb_sqs.decorators import task
@@ -58,8 +59,7 @@ def _auto_task_wrapper(module_name, class_name, func_name, *args, **kwargs):
 
 
 class AutoTaskService(object):
-    def register_task(self, method, queue_name=None, max_retries=None):
-        # type: (Any, str, int) -> None
+    def register_task(self, method: typing.Any, queue_name: str=None, max_retries: int=None):
         instance = method.__self__
         class_ = instance.__class__
         func_name = method.__name__
@@ -83,13 +83,11 @@ class AutoTaskService(object):
 
 class _AutoTaskExecutorService(AutoTaskService):
     def __init__(self, func_name):
-        # type: (str) -> None
         self._func_name = func_name
 
         self._executor_func_name = None
 
-    def register_task(self, method, queue_name=None, max_retries=None):
-        # type: (Any, str, int) -> None
+    def register_task(self, method, queue_name: str=None, max_retries: int=None):
         if self._func_name == method.__name__:
             # circuit breaker to allow actually executing the method once
             instance = method.__self__
@@ -100,5 +98,4 @@ class _AutoTaskExecutorService(AutoTaskService):
         super(_AutoTaskExecutorService, self).register_task(method, queue_name, max_retries)
 
     def get_executor_func_name(self):
-        # type: () -> str
         return self._executor_func_name

@@ -8,17 +8,14 @@ from eb_sqs.worker.worker import Worker
 
 class WorkerFactory(object, metaclass=ABCMeta):
     def __init__(self):
-        # type: () -> None
         super(WorkerFactory, self).__init__()
 
     @abstractmethod
-    def create(self):
-        # type: () -> Worker
+    def create(self) -> Worker:
         pass
 
     @staticmethod
-    def default():
-        # type: () -> WorkerFactory
+    def default() -> 'WorkerFactory':
         if not settings.WORKER_FACTORY:
             from eb_sqs.worker.sqs_worker_factory import SqsWorkerFactory
             return SqsWorkerFactory()

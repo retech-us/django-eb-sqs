@@ -1,39 +1,44 @@
+import typing
+
 from django.conf import settings
 
-AWS_REGION = getattr(settings, 'EB_AWS_REGION', 'us-east-1')  # type: str
+from eb_sqs.worker.worker_factory import WorkerFactory
 
-MAX_NUMBER_OF_MESSAGES = getattr(settings, 'EB_SQS_MAX_NUMBER_OF_MESSAGES', 10)  # type: int
-WAIT_TIME_S = getattr(settings, 'EB_SQS_WAIT_TIME_S', 2)  # type: int
-NO_QUEUES_WAIT_TIME_S = getattr(settings, 'NO_QUEUES_WAIT_TIME_S', 5)  # type: int
+AWS_REGION: str = getattr(settings, 'EB_AWS_REGION', 'us-east-1')
 
-AUTO_ADD_QUEUE = getattr(settings, 'EB_SQS_AUTO_ADD_QUEUE', False)  # type: bool
-QUEUE_PREFIX = getattr(settings, 'EB_SQS_QUEUE_PREFIX', '')  # type: str
-DEFAULT_QUEUE = getattr(settings, 'EB_SQS_DEFAULT_QUEUE', 'eb-sqs-default')  # type: str
+MAX_NUMBER_OF_MESSAGES: int = getattr(settings, 'EB_SQS_MAX_NUMBER_OF_MESSAGES', 10)
+WAIT_TIME_S: int = getattr(settings, 'EB_SQS_WAIT_TIME_S', 2)
+NO_QUEUES_WAIT_TIME_S: int = getattr(settings, 'NO_QUEUES_WAIT_TIME_S', 5)
 
-EXECUTE_INLINE = getattr(settings, 'EB_SQS_EXECUTE_INLINE', False)  # type: bool
-FORCE_SERIALIZATION = getattr(settings, 'EB_SQS_FORCE_SERIALIZATION', False)  # type: bool
+AUTO_ADD_QUEUE: bool = getattr(settings, 'EB_SQS_AUTO_ADD_QUEUE', False)
+QUEUE_PREFIX: str = getattr(settings, 'EB_SQS_QUEUE_PREFIX', '')
+DEFAULT_QUEUE: str = getattr(settings, 'EB_SQS_DEFAULT_QUEUE', 'eb-sqs-default')
 
-DEFAULT_DELAY = getattr(settings, 'EB_SQS_DEFAULT_DELAY', 0)  # type: int
-DEFAULT_MAX_RETRIES = getattr(settings, 'EB_SQS_DEFAULT_MAX_RETRIES', 0)  # type: int
-DEFAULT_COUNT_RETRIES = getattr(settings, 'EB_SQS_DEFAULT_COUNT_RETRIES', True)  # type: bool
+EXECUTE_INLINE: bool = getattr(settings, 'EB_SQS_EXECUTE_INLINE', False)
+FORCE_SERIALIZATION: bool = getattr(settings, 'EB_SQS_FORCE_SERIALIZATION', False)
 
-USE_PICKLE = getattr(settings, 'EB_SQS_USE_PICKLE', False)  # type: bool
+DEFAULT_DELAY: int = getattr(settings, 'EB_SQS_DEFAULT_DELAY', 0)
+DEFAULT_MAX_RETRIES: int = getattr(settings, 'EB_SQS_DEFAULT_MAX_RETRIES', 0)
+DEFAULT_COUNT_RETRIES: bool = getattr(settings, 'EB_SQS_DEFAULT_COUNT_RETRIES', True)
 
-WORKER_FACTORY = getattr(settings, 'EB_SQS_WORKER_FACTORY', None)  # type: WorkerFactory
+USE_PICKLE: bool = getattr(settings, 'EB_SQS_USE_PICKLE', False)
+
+# TODO: change to use importlib
+WORKER_FACTORY: typing.Union[str, WorkerFactory] = getattr(settings, 'EB_SQS_WORKER_FACTORY', None)
 
 # importable queue client class definition
-QUEUE_CLIENT_CLASS = getattr(settings, 'EB_SQS_QUEUE_CLIENT_CLASS', 'eb_sqs.aws.sqs_queue_client.SqsQueueClient')
+QUEUE_CLIENT_CLASS: str = getattr(settings, 'EB_SQS_QUEUE_CLIENT_CLASS', 'eb_sqs.aws.sqs_queue_client.SqsQueueClient')
 
-DEAD_LETTER_MODE = getattr(settings, 'EB_SQS_DEAD_LETTER_MODE', False)  # type: bool
+DEAD_LETTER_MODE: bool = getattr(settings, 'EB_SQS_DEAD_LETTER_MODE', False)
 
-AWS_MAX_RETRIES = getattr(settings, 'EB_SQS_AWS_MAX_RETRIES', 30)  # type: int
+AWS_MAX_RETRIES: int = getattr(settings, 'EB_SQS_AWS_MAX_RETRIES', 30)
 
-REFRESH_PREFIX_QUEUES_S = getattr(settings, 'EB_SQS_REFRESH_PREFIX_QUEUES_S', 10)  # type: int
+REFRESH_PREFIX_QUEUES_S: int = getattr(settings, 'EB_SQS_REFRESH_PREFIX_QUEUES_S', 10)
 
-QUEUE_MESSAGE_RETENTION = getattr(settings, 'EB_SQS_QUEUE_MESSAGE_RETENTION', '1209600')  # type: str
-QUEUE_VISIBILITY_TIMEOUT = getattr(settings, 'EB_SQS_QUEUE_VISIBILITY_TIMEOUT', '300')  # type: str
+QUEUE_MESSAGE_RETENTION: str = getattr(settings, 'EB_SQS_QUEUE_MESSAGE_RETENTION', '1209600')
+QUEUE_VISIBILITY_TIMEOUT: str = getattr(settings, 'EB_SQS_QUEUE_VISIBILITY_TIMEOUT', '300')
 
-MIN_HEALTHCHECK_WRITE_PERIOD_S = getattr(settings, 'EB_SQS_MIN_HEALTHCHECK_WRITE_PERIOD_S', 10)  # type: int
-HEALTHCHECK_UNHEALTHY_PERIOD_S = getattr(settings, 'EB_SQS_HEALTHCHECK_UNHEALTHY_PERIOD_S',
-                                         int(QUEUE_VISIBILITY_TIMEOUT))  # type: int
-HEALTHCHECK_FILE_NAME = getattr(settings, 'EB_SQS_HEALTHCHECK_FILE_NAME', 'healthcheck.txt')  # type: str
+MIN_HEALTHCHECK_WRITE_PERIOD_S: int = getattr(settings, 'EB_SQS_MIN_HEALTHCHECK_WRITE_PERIOD_S', 10)
+HEALTHCHECK_UNHEALTHY_PERIOD_S: int = getattr(settings, 'EB_SQS_HEALTHCHECK_UNHEALTHY_PERIOD_S',
+                                              int(QUEUE_VISIBILITY_TIMEOUT))
+HEALTHCHECK_FILE_NAME: str = getattr(settings, 'EB_SQS_HEALTHCHECK_FILE_NAME', 'healthcheck.txt')

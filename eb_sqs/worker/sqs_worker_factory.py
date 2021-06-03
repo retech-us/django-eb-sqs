@@ -6,7 +6,7 @@ from eb_sqs.worker.worker_factory import WorkerFactory
 
 
 class SqsWorkerFactory(WorkerFactory):
-    _WORKER = None  # type: Worker
+    _WORKER: Worker = None
 
     def __init__(self):
         super(SqsWorkerFactory, self).__init__()

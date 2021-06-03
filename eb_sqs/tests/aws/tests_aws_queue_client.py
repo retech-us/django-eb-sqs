@@ -1,9 +1,9 @@
 import time
 from unittest import TestCase
+from unittest.mock import patch
 
 import boto3
 from botocore.exceptions import ClientError
-from mock import patch
 from moto import mock_sqs
 
 from eb_sqs import settings
