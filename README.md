@@ -119,6 +119,33 @@ Notice the following:
 In case you want your method to retry certain cases, you need to raise `RetryableTaskException`.
 You can provide on optional `delay` time for the retry, set `count_retries=False` in case you don't want to limit retries, or use `max_retries_func` to specify a function which will be invoked when the defined maximum number of retries is exhausted.   
 
+#### Queue Client initialization
+In case you want to use AK and SAK to initialize SQS connection with any other parameter outside of django-eb-sqs settings
+you can define your own `QueueClient` class and set a configuration `EB_SQS_QUEUE_CLIENT_CLASS`.
+
+For example
+
+```python
+# your_app/contrib/aws/sqs.py
+import boto3
+
+from eb_sqs.aws.sqs_queue_client import SqsQueueClient
+
+
+class CustomQueueClient(SqsQueueClient):
+    def __init__(self):
+        self.queue_cache = {}
+        
+        # copied directly from https://github.com/softwaremill/elasticmq
+        self.sqs =  boto3.resource('sqs',
+                        endpoint_url='http://localhost:9324',
+                        region_name='elasticmq',
+                        aws_secret_access_key='x',
+                        aws_access_key_id='x',
+                        use_ssl=False)
+
+```
+
 #### Settings
 
 The following settings can be used to fine tune django-eb-sqs. Copy them into your Django `settings.py` file.
@@ -141,7 +168,7 @@ The following settings can be used to fine tune django-eb-sqs. Copy them into yo
 - EB_SQS_USE_PICKLE (`False`): Enable to use `pickle` to serialize task parameters. Uses `json` as default.
 - EB_SQS_AWS_MAX_RETRIES (`30`): Default retry limit on a boto3 call to AWS SQS.
 - EB_SQS_REFRESH_PREFIX_QUEUES_S (`10`): Minimal number of seconds to wait between refreshing queue list, in case prefix is used
-
+- EB_SQS_QUEUE_CLIENT_CLASS="eb_sqs.aws.sqs_queue_client.SqsQueueClient": Set default queue client class. Useful if you need to use [elasticmq](https://github.com/softwaremill/elasticmq) or connect using Access Key and Secret Access Key
 
 ### Development
 

@@ -23,6 +23,9 @@ USE_PICKLE = getattr(settings, 'EB_SQS_USE_PICKLE', False)  # type: bool
 
 WORKER_FACTORY = getattr(settings, 'EB_SQS_WORKER_FACTORY', None)  # type: WorkerFactory
 
+# importable queue client class definition
+QUEUE_CLIENT_CLASS = getattr(settings, 'EB_SQS_QUEUE_CLIENT_CLASS', 'eb_sqs.aws.sqs_queue_client.SqsQueueClient')
+
 DEAD_LETTER_MODE = getattr(settings, 'EB_SQS_DEAD_LETTER_MODE', False)  # type: bool
 
 AWS_MAX_RETRIES = getattr(settings, 'EB_SQS_AWS_MAX_RETRIES', 30)  # type: int
