@@ -1,4 +1,5 @@
 from django.core.management import BaseCommand, CommandError
+from django.utils import autoreload
 from django.utils.module_loading import import_string
 
 from eb_sqs import settings
@@ -13,7 +14,10 @@ class Command(BaseCommand):
                             dest='queue_names',
                             help='Name of queues to process, separated by commas')
 
-    def handle(self, *args, **options):
+        parser.add_argument('--reloader', dest='use_reloader', action='store_true',
+                            help="Tells django to use auto-reloader")
+
+    def _run(self, **options):
         if not options['queue_names']:
             raise CommandError('Queue names (--queues) not specified')
 
@@ -23,3 +27,12 @@ class Command(BaseCommand):
 
         queue_client = queue_client_class()
         WorkerService(queue_client).process_queues(queue_names)
+
+    def handle(self, **options):
+        """Run the server, using the autoreloader if needed."""
+        use_reloader = options.get('use_reloader', False)
+
+        if use_reloader:
+            autoreload.run_with_reloader(self._run, **options)
+        else:
+            self._run(**options)
