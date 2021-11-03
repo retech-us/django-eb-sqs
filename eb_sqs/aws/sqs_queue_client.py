@@ -83,4 +83,4 @@ class SqsQueueClient(QueueClient):
         return queues
 
     def get_queues_by_names(self, queue_names: typing.List[str]):
-        return [self.sqs.get_queue_by_name(QueueName=queue_name) for queue_name in queue_names]
+        return [self._get_queue(queue_name) for queue_name in queue_names]

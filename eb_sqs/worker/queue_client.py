@@ -11,6 +11,9 @@ class QueueDoesNotExistException(QueueClientException):
         super(QueueDoesNotExistException, self).__init__()
         self.queue_name = queue_name
 
+    def __repr__(self):
+        return f"QueueDoesNotExistException {self.queue_name}"
+
 
 class QueueClient(object, metaclass=ABCMeta):
     @abstractmethod
