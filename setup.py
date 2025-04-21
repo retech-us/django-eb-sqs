@@ -1,4 +1,5 @@
 import os
+
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -17,8 +18,8 @@ setup(
     url="https://github.com/rebotics/django-eb-sqs",
     install_requires=[
         "boto3>=1.9.86",
-        "Django>=3.2.3",
-        "requests>=2.10.0",
+        "django>=5.1.8",
+        "requests==2.32.0",
     ],
     classifiers=[
         "Intended Audience :: Developers",

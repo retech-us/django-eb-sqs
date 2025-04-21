@@ -1,4 +1,0 @@
-boto3>=1.9.86
-Django==3.2.4
-moto[all]
-requests>=2.10.0
