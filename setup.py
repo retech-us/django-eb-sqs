@@ -2,33 +2,34 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-VERSION = open(os.path.join(here, 'VERSION')).read()
-README = open(os.path.join(here, 'README.md')).read()
+VERSION = open(os.path.join(here, "VERSION")).read()
+README = open(os.path.join(here, "README.md")).read()
 
 setup(
-    name='django-eb-sqs',
+    name="django-eb-sqs",
     version=VERSION,
-    package_dir={'eb_sqs': 'eb_sqs'},
+    package_dir={"eb_sqs": "eb_sqs"},
     include_package_data=True,
     packages=find_packages(),
-    description='A simple task manager for AWS SQS',
+    description="A simple task manager for AWS SQS",
     long_description=README,
     long_description_content_type="text/markdown",
-    url='https://github.com/rebotics/django-eb-sqs',
+    url="https://github.com/rebotics/django-eb-sqs",
     install_requires=[
-        'boto3>=1.9.86',
-        'Django>=3.2.3',
-        'requests>=2.10.0',
+        "boto3>=1.9.86",
+        "Django>=3.2.3",
+        "requests>=2.10.0",
     ],
     classifiers=[
-        'Intended Audience :: Developers',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Topic :: Software Development',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-        'Framework :: Django'
-    ]
+        "Intended Audience :: Developers",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Topic :: Software Development",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Framework :: Django",
+    ],
 )
