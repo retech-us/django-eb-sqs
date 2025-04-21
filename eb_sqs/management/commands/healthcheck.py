@@ -13,22 +13,26 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = 'Checks the SQS worker is healthy, and if not returns a failure code'
+    help = "Checks the SQS worker is healthy, and if not returns a failure code"
 
     def add_arguments(self, parser):
         pass
 
     def handle(self, *args, **options):
         try:
-            with open(settings.HEALTHCHECK_FILE_NAME, 'r') as file:
+            with open(settings.HEALTHCHECK_FILE_NAME, "r") as file:
                 last_healthcheck_date_str = file.readlines()[0]
 
-                if parse_datetime(last_healthcheck_date_str) < timezone.now() - timedelta(seconds=settings.HEALTHCHECK_UNHEALTHY_PERIOD_S):
+                if parse_datetime(
+                    last_healthcheck_date_str
+                ) < timezone.now() - timedelta(
+                    seconds=settings.HEALTHCHECK_UNHEALTHY_PERIOD_S
+                ):
                     self._return_failure()
         except Exception:
             self._return_failure()
 
     @staticmethod
     def _return_failure():
-        logger.warning('[django-eb-sqs] Health check failed')
+        logger.warning("[django-eb-sqs] Health check failed")
         sys.exit(1)

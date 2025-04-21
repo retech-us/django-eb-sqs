@@ -72,7 +72,7 @@ class WorkerTest(TestCase):
 
         result = self.worker.execute(msg)
 
-        self.assertEqual(result, 'Hello World!')
+        self.assertEqual(result, "Hello World!")
 
     def test_worker_execution_dead_letter_queue(self):
         settings.DEAD_LETTER_MODE = True
@@ -84,17 +84,21 @@ class WorkerTest(TestCase):
         self.assertIsNone(result)
 
     def test_delay(self):
-        self.worker.delay(None, 'queue', dummy_task, [], {'msg': 'Hello World!'}, 5, False, 3, False)
+        self.worker.delay(
+            None, "queue", dummy_task, [], {"msg": "Hello World!"}, 5, False, 3, False
+        )
 
         self.queue_mock.add_message.assert_called_once()
         queue_delay = self.queue_mock.add_message.call_args[0][2]
         self.assertEqual(queue_delay, 3)
 
     def test_delay_inline(self):
-        result = self.worker.delay(None, 'queue', dummy_task, [], {'msg': 'Hello World!'}, 5, False, 0, True)
+        result = self.worker.delay(
+            None, "queue", dummy_task, [], {"msg": "Hello World!"}, 5, False, 0, True
+        )
 
         self.queue_mock.add_message.assert_not_called()
-        self.assertEqual(result, 'Hello World!')
+        self.assertEqual(result, "Hello World!")
 
     def test_retry_max_reached_execution(self):
         with self.assertRaises(MaxRetriesReachedException):
