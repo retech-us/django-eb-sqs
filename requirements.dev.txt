@@ -1,0 +1,4 @@
+boto3>=1.9.86
+django>=5.1.8
+moto[all]==4.2.14
+requests==2.32.0

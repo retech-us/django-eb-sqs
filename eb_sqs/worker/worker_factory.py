@@ -1,5 +1,3 @@
-
-
 from abc import ABCMeta, abstractmethod
 
 from eb_sqs import settings
@@ -15,9 +13,10 @@ class WorkerFactory(object, metaclass=ABCMeta):
         pass
 
     @staticmethod
-    def default() -> 'WorkerFactory':
+    def default() -> "WorkerFactory":
         if not settings.WORKER_FACTORY:
             from eb_sqs.worker.sqs_worker_factory import SqsWorkerFactory
+
             return SqsWorkerFactory()
         else:
             return settings.WORKER_FACTORY

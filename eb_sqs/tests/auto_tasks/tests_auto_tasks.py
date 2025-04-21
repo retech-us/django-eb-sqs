@@ -14,7 +14,9 @@ class TestService:
         self._auto_task_service = auto_task_service or AutoTaskService()
 
         self._auto_task_service.register_task(self.task_method)
-        self._auto_task_service.register_task(self.task_retry_method, max_retries=self.MAX_RETRY_NUM)
+        self._auto_task_service.register_task(
+            self.task_retry_method, max_retries=self.MAX_RETRY_NUM
+        )
 
         self._auto_task_service.register_task(self.task_recursive_method)
         self._auto_task_service.register_task(self.task_other_method)
@@ -28,7 +30,7 @@ class TestService:
         def max_retry_fun():
             self.TEST_MOCK.task_max_retry_method(*args, **kwargs)
 
-        raise RetryableTaskException(Exception('Test'), max_retries_func=max_retry_fun)
+        raise RetryableTaskException(Exception("Test"), max_retries_func=max_retry_fun)
 
     def non_task_method(self):
         self.TEST_MOCK.non_task_method()
@@ -47,8 +49,8 @@ class AutoTasksTest(TestCase):
     def setUp(self):
         self._test_service = TestService()
 
-        self._args = [5, '6']
-        self._kwargs = {'p1': 'bla', 'p2': 130}
+        self._args = [5, "6"]
+        self._kwargs = {"p1": "bla", "p2": 130}
 
         settings.EXECUTE_INLINE = True
 
@@ -57,7 +59,9 @@ class AutoTasksTest(TestCase):
     def test_task_method(self):
         self._test_service.task_method(*self._args, **self._kwargs)
 
-        TestService.TEST_MOCK.task_method.assert_called_once_with(*self._args, **self._kwargs)
+        TestService.TEST_MOCK.task_method.assert_called_once_with(
+            *self._args, **self._kwargs
+        )
 
     def test_task_retry_method(self):
         self._test_service.task_retry_method(*self._args, **self._kwargs)
@@ -66,14 +70,16 @@ class AutoTasksTest(TestCase):
             [call(*self._args, **self._kwargs)] * TestService.MAX_RETRY_NUM
         )
 
-        TestService.TEST_MOCK.task_max_retry_method.assert_called_once_with(*self._args, **self._kwargs)
+        TestService.TEST_MOCK.task_max_retry_method.assert_called_once_with(
+            *self._args, **self._kwargs
+        )
 
     def test_non_task_method(self):
         _auto_task_wrapper.delay(
             self._test_service.__class__.__module__,
             self._test_service.__class__.__name__,
             TestService.non_task_method.__name__,
-            execute_inline=True
+            execute_inline=True,
         )
 
         TestService.TEST_MOCK.non_task_method.assert_not_called()
