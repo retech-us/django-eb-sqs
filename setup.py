@@ -18,7 +18,7 @@ setup(
     url="https://github.com/rebotics/django-eb-sqs",
     install_requires=[
         "boto3>=1.9.86",
-        "django>=5.1.8",
+        "django>=5.0.0",
         "requests",
     ],
     classifiers=[
