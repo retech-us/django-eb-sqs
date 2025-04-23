@@ -17,9 +17,9 @@ from eb_sqs.worker.worker_factory import WorkerFactory
 
 logger = logging.getLogger(__name__)
 
-MESSAGES_RECEIVED = django.dispatch.Signal(providing_args=["messages"])
-MESSAGES_PROCESSED = django.dispatch.Signal(providing_args=["messages"])
-MESSAGES_DELETED = django.dispatch.Signal(providing_args=["messages"])
+MESSAGES_RECEIVED = django.dispatch.Signal()
+MESSAGES_PROCESSED = django.dispatch.Signal()
+MESSAGES_DELETED = django.dispatch.Signal()
 
 
 class WorkerService(object):
@@ -87,9 +87,9 @@ class WorkerService(object):
 
         while not self._exit_gracefully:
             if (
-                len(queue_prefixes) > 0
-                and timezone.now() - timedelta(seconds=settings.REFRESH_PREFIX_QUEUES_S)
-                > last_update_time
+                    len(queue_prefixes) > 0
+                    and timezone.now() - timedelta(seconds=settings.REFRESH_PREFIX_QUEUES_S)
+                    > last_update_time
             ):
                 queues = static_queues + self.sqs_client.get_queues_by_prefixes(
                     queue_prefixes
@@ -133,8 +133,8 @@ class WorkerService(object):
             except ClientError as exc:
                 error_code = exc.response.get("Error", {}).get("Code", None)
                 if (
-                    error_code == "AWS.SimpleQueueService.NonExistentQueue"
-                    and queue not in static_queues
+                        error_code == "AWS.SimpleQueueService.NonExistentQueue"
+                        and queue not in static_queues
                 ):
                     logger.debug(
                         "[django-eb-sqs] Queue was already deleted {}: {}".format(
@@ -156,9 +156,9 @@ class WorkerService(object):
                 )
 
             if (
-                timezone.now()
-                - timedelta(seconds=settings.MIN_HEALTHCHECK_WRITE_PERIOD_S)
-                > self._last_healthcheck_time
+                    timezone.now()
+                    - timedelta(seconds=settings.MIN_HEALTHCHECK_WRITE_PERIOD_S)
+                    > self._last_healthcheck_time
             ):
                 self.write_healthcheck_file()
                 self._last_healthcheck_time = timezone.now()
